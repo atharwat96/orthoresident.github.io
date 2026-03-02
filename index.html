@@ -921,12 +921,18 @@ function doPost(e) {
         patients = json.data.map((row,i) => ({
           id:i+1, room:row.Room||'', admission:(function(v){
             if (!v) return '';
-            const s = v.toString();
-            // ISO format: 2024-01-15T... — take date part directly
-            if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
-            // Date object or locale string — parse as UTC to avoid timezone shift
+            const s = v.toString().trim();
+            // Already clean YYYY-MM-DD — use as-is
+            if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+            // Parse then use LOCAL date parts (getFullYear/Month/Date) — not UTC
+            // This avoids the UTC-midnight → previous-day shift in +ve timezones
             const d = new Date(s);
-            if (!isNaN(d)) return d.toISOString().slice(0,10);
+            if (!isNaN(d)) {
+              const y = d.getFullYear();
+              const m = String(d.getMonth()+1).padStart(2,'0');
+              const dy = String(d.getDate()).padStart(2,'0');
+              return y+'-'+m+'-'+dy;
+            }
             return s.slice(0,10);
           })(row.Admission), name:row.Name||'', age:row.Age||'',
           diagnosis:row.Diagnosis||'', decision:row.Decision||'',
