@@ -919,7 +919,7 @@ function doPost(e) {
       const json = await res.json();
       if (json.data) {
         patients = json.data.map((row,i) => ({
-          id:i+1, room:row.Room||'', admission:(row.Admission||''), name:row.Name||'', age:row.Age||'',
+          id:i+1, room:row.Room||'', admission:(row.Admission||'').toString().split('T')[0], name:row.Name||'', age:row.Age||'',
           diagnosis:row.Diagnosis||'', decision:row.Decision||'',
           hb:row.Hb||'', plt:row.Plt||'', inr:row.INR||'',
           lft:row.LFT||'', rft:row.RFT||'', abo:row.ABO||'',
